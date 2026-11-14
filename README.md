@@ -65,6 +65,12 @@ No navegador, clique em **Abrir atlas da jornada** para consultar os locais. Par
 
 As prévias SVG são **esquemáticas, não arte final**. As posições no atlas não seguem escala geográfica real.
 
+## Mapas ilustrados
+
+Foram adicionadas quatro artes detalhadas originais em WebP para **Hobbiton, Bri, Valfenda e Moria**. Abra cada cena no jogo e use **Ver arte detalhada do cenário** para visualizá-las. Consulte o [guia de artes](docs/artes-detalhadas.md) para limitações técnicas.
+
+O mapa de movimento ainda usa tiles procedurais. A arte ilustrada é uma prévia visual e não coincide com o sistema de colisões; a integração tática exigirá alinhamento de geometria e camadas.
+
 ## Segurança e licenciamento
 
 **Não publique esta versão como servidor aberto.** O papel de Mestre é escolhido pelo visitante, não há autenticação, controle de acesso nem proteção contra abuso. O modo de demonstração é destinado exclusivamente ao desenvolvimento local.

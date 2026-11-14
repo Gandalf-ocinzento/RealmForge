@@ -7,6 +7,7 @@ import {
 } from "@realmforge/contracts";
 import {MapCanvas} from "./MapCanvas";
 import {JourneyAtlas} from "./JourneyAtlas";
+import {ArtPreview,ART_MAPS} from "./ArtPreview";
 
 const API_URL=import.meta.env.VITE_API_URL??"http://localhost:3001";
 const BRUSHES:Array<{id:Terrain;label:string;icon:string}>=[
@@ -36,6 +37,7 @@ export function App(){
  const [tool,setTool]=useState<"move"|Terrain>("move");
  const [zoom,setZoom]=useState(.8);
  const [atlasOpen,setAtlasOpen]=useState(false);
+ const [artOpen,setArtOpen]=useState(false);
  const socket=useRef<Socket|null>(null);
  const playerId=useRef("");
  useEffect(()=>()=>{socket.current?.disconnect();},[]);
@@ -67,7 +69,7 @@ export function App(){
  const travel=useCallback((sceneId:string)=>{
    socket.current?.emit("world:travel",{sceneId},(r:ActionResult)=>{
      if(!r?.ok)setError(r?.error??"Falha na viagem.");
-     else{setError("");setTool("move");}
+     else{setError("");setTool("move");setArtOpen(false);}
    });
  },[]);
  const sendChat=useCallback(()=>{
@@ -115,6 +117,7 @@ export function App(){
        <div className="section-heading">REGIÃO ATUAL</div>
        <div className="scene-card"><strong>{scene?.name??"..."}</strong>
          <p>{scene?.description}</p><small>Marco: {scene?.landmark}</small></div>
+       {scene && ART_MAPS[scene.id] && <button className="art-preview-button" onClick={()=>setArtOpen(true)}>✦ Ver arte detalhada do cenário</button>}
        <div className="section-heading">VIAGEM ENTRE CENAS</div>
        <p className="hint">Caminhe até a borda oeste ou leste da estrada para atravessar. Mestre pode viajar de qualquer lugar.</p>
        {exits.previous&&<button className="travel-button" onClick={()=>travel(exits.previous!.id)}>← {exits.previous.name}</button>}
@@ -183,6 +186,7 @@ export function App(){
      </aside>
    </div>
    {atlasOpen&&<JourneyAtlas currentSceneId={world?.sceneId??"hobbiton"} onClose={()=>setAtlasOpen(false)}/>}
+   {artOpen&&scene&&ART_MAPS[scene.id]&&<ArtPreview sceneId={scene.id} sceneName={scene.name} onClose={()=>setArtOpen(false)}/>}
    {error&&<div className="toast" role="alert"><span>{error}</span><button onClick={()=>setError("")}>×</button></div>}
  </div>;
 }

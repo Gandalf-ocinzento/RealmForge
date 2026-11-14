@@ -1,0 +1,13 @@
+.art-preview-button{width:100%;border:1px solid #a38a55;background:#3a392b;color:#ecd4a2;border-radius:6px;padding:10px 12px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;margin:10px 0 4px}
+.art-preview-button:hover{background:#544936}
+.art-backdrop{position:fixed;inset:0;background:#050a06ec;z-index:60;padding:15px;display:grid;place-items:center}
+.art-panel{background:#18241a;border:1px solid #8c7951;border-radius:12px;width:min(1280px,100%);max-height:96vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 90px #000c}
+.art-header{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #45513e}
+.art-header h2{margin:5px 0 0;font:600 21px Cinzel,Georgia,serif;color:#e2ca93}
+.art-close{border:1px solid #60765a;background:#253729;color:#e9e8d8;font-size:22px;border-radius:7px;min-width:36px;min-height:36px;cursor:pointer}
+.art-image-wrap{min-height:0;overflow:auto;background:#10170f;display:flex;align-items:start;justify-content:center}
+.art-image-wrap img{display:block;width:100%;height:auto;object-fit:contain}
+.art-footer{display:flex;gap:20px;justify-content:space-between;align-items:center;padding:12px 20px;font-size:12px;color:#9eb29c}
+.art-footer p{margin:0;line-height:1.5}
+.art-footer a{color:#e0c589;white-space:nowrap}
+@media(max-width:740px){.art-footer{display:block}.art-footer a{display:block;margin-top:8px}}
