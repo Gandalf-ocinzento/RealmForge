@@ -1,146 +1,128 @@
 import { useEffect, useRef } from "react";
 import { Application, Container, Graphics, Text } from "pixi.js";
 import {
-  TILE_SIZE, type Terrain, type WorldState, type WorldCommand,
+  TILE_SIZE,SCENE_NEXT,type Terrain,type WorldState,type WorldCommand
 } from "@realmforge/contracts";
-
 interface Props {
-  world: WorldState;
-  playerId: string;
-  isMaster: boolean;
-  tool: "move" | Terrain;
-  onCommand: (command: WorldCommand) => void;
-  zoom: number;
+ world:WorldState;playerId:string;isMaster:boolean;tool:"move"|Terrain;
+ onCommand:(cmd:WorldCommand)=>void; zoom:number;
+ onTravel:(sceneId:string)=>void;
 }
-
-const palette: Record<Terrain, number> = {
-  grass: 0x345743,
-  road: 0x9b8a67,
-  dirt: 0x6d6048,
-  water: 0x386984,
-  wall: 0x596259
+const palette:Record<Terrain,number>={
+ grass:0x436a46,road:0xb9a279,dirt:0x866b4a,water:0x3f7891,
+ wall:0x5b5c57,forest:0x315f3d,tree:0x24482e,stone:0x89857b,
+ snow:0xe3e4d8,floor:0xb0a28a,marsh:0x596c50,
+ bridge:0xb58a60,mountain:0x62616a
 };
-
-function tile(world: WorldState, x: number, y: number): Terrain {
-  return world.terrain[y * world.width + x];
+function render(stage:Container,p:Props){
+ const {world,playerId,isMaster,tool,onCommand,onTravel}=p;
+ for(const child of stage.removeChildren()) child.destroy({children:true});
+ const ts=TILE_SIZE,me=world.players[playerId];
+ const route=SCENE_NEXT(world.sceneId);
+ for(let y=0;y<world.height;y++){
+   for(let x=0;x<world.width;x++){
+     const t=world.terrain[y*world.width+x];
+     const obj=new Graphics();
+     const left=x*ts,top=y*ts;
+     obj.rect(left,top,ts,ts).fill(palette[t]);
+     obj.rect(left,top,ts,ts).stroke({color:0x152018,width:0.7,alpha:0.3});
+     if(t==="grass"||t==="forest"){
+       const n=(x*13+y*17)%7;
+       if(n<3) obj.circle(left+7+n*5,top+7+n*3,1.5).fill({color:0xc4d0a0,alpha:0.45});
+     }
+     if(t==="water"){
+       obj.moveTo(left+5,top+12).quadraticCurveTo(left+16,top+8,left+27,top+12)
+          .stroke({color:0x94b5bb,width:1,alpha:0.5});
+     }
+     if(t==="tree"){
+       obj.circle(left+16,top+17,11).fill(0x366b43).stroke({color:0x1b3f29,width:2});
+       obj.circle(left+11,top+10,5).fill({color:0x709065,alpha:0.5});
+     }
+     if(t==="wall"){
+       obj.rect(left+3,top+3,ts-6,ts-6).fill(0x67685d)
+          .stroke({color:0xb0a790,width:1});
+       obj.moveTo(left+3,top+ts/2).lineTo(left+ts-3,top+ts/2)
+          .stroke({color:0x454940,width:1});
+     }
+     if(t==="road"||t==="bridge"){
+       obj.circle(left+6,top+23,1).fill({color:0x6e5f4a,alpha:0.4});
+     }
+     obj.eventMode="static";obj.cursor="pointer";
+     obj.on("pointertap",()=>{
+       if(isMaster&&tool!=="move"){
+         onCommand({type:"map.paint",x,y,terrain:tool});return;
+       }
+       if(!me)return;
+       if(Math.abs(me.x-x)+Math.abs(me.y-y)===1)
+         onCommand({type:"player.move",x,y});
+     });
+     stage.addChild(obj);
+   }
+ }
+ // Portais na margem oeste e leste dos caminhos.
+ for(const side of ["west","east"] as const){
+   const destination=side==="west"?route.previous:route.next;
+   if(!destination)continue;
+   const x=side==="west"?0:world.width-1;
+   const portal=new Graphics();
+   portal.roundRect(x*ts+3,world.height*ts/2-28,ts-6,56,6)
+      .fill({color:0xdec684,alpha:.82}).stroke({color:0x4e3922,width:2});
+   // Faixa de entrada visual; o botão de viagem faz validação de borda no servidor.
+   portal.eventMode="static";portal.cursor="pointer";
+   portal.on("pointertap",()=>onTravel(destination.id));
+   stage.addChild(portal);
+ }
+ for(const door of world.doors){
+   const obj=new Graphics(),left=door.x*ts,top=door.y*ts;
+   obj.roundRect(left+5,top+5,ts-10,ts-10,4)
+      .fill(door.open?0x80c38c:0xdaaa5d).stroke({width:2,color:0x2d2a1e});
+   obj.eventMode="static";obj.cursor="pointer";
+   obj.on("pointertap",()=>onCommand({type:"door.toggle",doorId:door.id}));
+   stage.addChild(obj);
+ }
+ for(const player of Object.values(world.players)){
+   const px=player.x*ts+ts/2,py=player.y*ts+ts/2;
+   const marker=new Graphics();
+   marker.circle(px,py,player.id===playerId?12:10)
+     .fill(player.color).stroke({width:3,color:0x17251b});
+   marker.eventMode="none";stage.addChild(marker);
+   const label=new Text({text:player.name.slice(0,1).toUpperCase(),style:{
+     fontFamily:"Arial",fontSize:12,fontWeight:"bold",fill:0x152319
+   }});
+   label.anchor.set(.5);label.position.set(px,py);label.eventMode="none";
+   stage.addChild(label);
+ }
 }
-
-function drawWorld(
-  stage: Container, world: WorldState, playerId: string,
-  isMaster: boolean, tool: Props["tool"], onCommand: Props["onCommand"],
-): void {
-  for (const item of stage.removeChildren()) item.destroy({ children: true });
-  const tileSize = TILE_SIZE;
-  const local = world.players[playerId];
-
-  for (let y = 0; y < world.height; y++) {
-    for (let x = 0; x < world.width; x++) {
-      const kind = tile(world, x, y);
-      const cell = new Graphics();
-      cell.rect(x * tileSize, y * tileSize, tileSize, tileSize)
-        .fill(palette[kind]);
-      cell.rect(x * tileSize, y * tileSize, tileSize, tileSize)
-        .stroke({ color: 0x101c17, width: 0.75, alpha: 0.42 });
-      if ((x * 7 + y * 11) % 9 === 0 && kind === "grass") {
-        cell.circle(x * tileSize + 7, y * tileSize + 12, 2).fill({ color: 0x83a782, alpha: 0.6 });
-        cell.circle(x * tileSize + 26, y * tileSize + 25, 1.5).fill({ color: 0xb2c190, alpha: 0.5 });
-      }
-      cell.eventMode = "static";
-      cell.cursor = "pointer";
-      cell.on("pointertap", () => {
-        if (isMaster && tool !== "move") {
-          onCommand({ type: "map.paint", x, y, terrain: tool });
-          return;
-        }
-        if (!local) return;
-        if (Math.abs(local.x - x) + Math.abs(local.y - y) === 1) {
-          onCommand({ type: "player.move", x, y });
-        }
-      });
-      stage.addChild(cell);
-    }
-  }
-
-  for (const door of world.doors) {
-    const item = new Graphics();
-    const x = door.x * tileSize;
-    const y = door.y * tileSize;
-    item.roundRect(x + 5, y + 5, tileSize - 10, tileSize - 10, 3)
-      .fill(door.open ? 0x6d9c72 : 0xc79a51)
-      .stroke({ width: 2, color: 0x1c2a20 });
-    item.eventMode = "static";
-    item.cursor = "pointer";
-    item.on("pointertap", () => onCommand({ type: "door.toggle", doorId: door.id }));
-    stage.addChild(item);
-  }
-  for (const player of Object.values(world.players)) {
-    const px = player.x * tileSize + tileSize / 2;
-    const py = player.y * tileSize + tileSize / 2;
-    const marker = new Graphics();
-    marker.circle(px, py, player.id === playerId ? 13 : 11)
-      .fill(player.color)
-      .stroke({ width: player.id === playerId ? 3 : 2, color: 0x112119 });
-    marker.eventMode = "none";
-    stage.addChild(marker);
-
-    const initials = new Text({
-      text: player.name.slice(0, 1).toUpperCase(),
-      style: { fontFamily: "Arial", fontSize: 12, fontWeight: "bold", fill: 0x122016 }
-    });
-    initials.anchor.set(0.5);
-    initials.position.set(px, py);
-    initials.eventMode = "none";
-    stage.addChild(initials);
-  }
-}
-
-export function MapCanvas({ world, playerId, isMaster, tool, onCommand, zoom }: Props) {
-  const host = useRef<HTMLDivElement>(null);
-  const game = useRef<Application | null>(null);
-  const stage = useRef<Container | null>(null);
-  const previous = useRef({ world, playerId, isMaster, tool, onCommand, zoom });
-  previous.current = { world, playerId, isMaster, tool, onCommand, zoom };
-
-  useEffect(() => {
-    let active = true;
-    const app = new Application();
-    (async () => {
-      await app.init({
-        width: world.width * TILE_SIZE,
-        height: world.height * TILE_SIZE,
-        background: "#14241c", antialias: true
-      });
-      if (!active || !host.current) {
-        app.destroy(true);
-        return;
-      }
-      const layer = new Container();
-      app.stage.addChild(layer);
-      game.current = app;
-      stage.current = layer;
-      host.current.appendChild(app.canvas);
-      const p = previous.current;
-      drawWorld(layer, p.world, p.playerId, p.isMaster, p.tool, p.onCommand);
-      app.canvas.style.width = (p.world.width * TILE_SIZE * p.zoom) + "px";
-      app.canvas.style.height = (p.world.height * TILE_SIZE * p.zoom) + "px";
-    })().catch(err => console.error("Falha ao inicializar mapa:", err));
-    return () => {
-      active = false;
-      stage.current = null;
-      game.current = null;
-      app.destroy(true, { children: true });
-    };
-    // Inicializar o renderer somente uma vez por montagem.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (!stage.current || !game.current) return;
-    drawWorld(stage.current, world, playerId, isMaster, tool, onCommand);
-    game.current.canvas.style.width = (world.width * TILE_SIZE * zoom) + "px";
-    game.current.canvas.style.height = (world.height * TILE_SIZE * zoom) + "px";
-  }, [world, playerId, isMaster, tool, onCommand, zoom]);
-  return <div className="map-scroll" aria-label="Mapa interativo da vila">
-    <div ref={host} className="map-host" />
-  </div>;
+export function MapCanvas(props:Props){
+ const host=useRef<HTMLDivElement>(null);
+ const app=useRef<Application|null>(null);
+ const stage=useRef<Container|null>(null);
+ const current=useRef(props); current.current=props;
+ useEffect(()=>{
+   let live=true;
+   const a=new Application();
+   (async()=>{
+     await a.init({
+       width:current.current.world.width*TILE_SIZE,
+       height:current.current.world.height*TILE_SIZE,
+       background:"#1f3226",antialias:true
+     });
+     if(!live||!host.current){a.destroy(true);return;}
+     const layer=new Container();a.stage.addChild(layer);
+     app.current=a;stage.current=layer;host.current.appendChild(a.canvas);
+     render(layer,current.current);
+     a.canvas.style.width=(current.current.world.width*TILE_SIZE*current.current.zoom)+"px";
+     a.canvas.style.height=(current.current.world.height*TILE_SIZE*current.current.zoom)+"px";
+   })().catch(console.error);
+   return()=>{live=false;app.current=null;stage.current=null;a.destroy(true,{children:true});};
+ },[]);
+ useEffect(()=>{
+   if(!app.current||!stage.current)return;
+   render(stage.current,props);
+   app.current.canvas.style.width=(props.world.width*TILE_SIZE*props.zoom)+"px";
+   app.current.canvas.style.height=(props.world.height*TILE_SIZE*props.zoom)+"px";
+ },[props]);
+ return <div className="map-scroll" aria-label="Mapa interativo com trilhas e portais">
+   <div ref={host} className="map-host"/>
+ </div>;
 }

@@ -1,0 +1,22 @@
+.atlas-open,.travel-button{display:block;width:100%;border:1px solid #746547;background:#2a3a2b;color:#e5d8b4;border-radius:6px;padding:10px;text-align:left;margin:4px 0 9px;font-size:12px}
+.atlas-open{background:#bda46d;color:#19251a;font-weight:700;text-align:center}
+.travel-button:hover,.atlas-open:hover{filter:brightness(1.15)}
+.scene-card{border:1px solid #415641;background:#203127;padding:11px;border-radius:8px}
+.scene-card strong{color:#e7d4a0;font-family:Cinzel,serif;font-size:13px}
+.scene-card p{color:#aec3ad;font-size:11px;line-height:1.6}
+.scene-card small{color:#bcaa81;font-size:10px}
+.atlas-backdrop{position:fixed;inset:0;background:#080f0cde;z-index:50;display:grid;place-items:center;padding:16px}
+.atlas-panel{background:#1b281e;border:1px solid #706346;border-radius:13px;width:min(1060px,98vw);max-height:96vh;display:flex;flex-direction:column;box-shadow:0 40px 100px #000b;overflow:hidden}
+.atlas-header{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #3b4b39}
+.atlas-header h2{font-family:Cinzel,serif;color:#e1c88a;margin:5px 0 0}
+.atlas-close{background:#314134;border:1px solid #637358;color:#e5e7d6;border-radius:5px;padding:5px 11px;font-size:20px}
+.atlas-scroll{min-height:180px;overflow:auto;flex:1;padding:12px;background:#0e1912}
+.atlas-parchment{margin:auto;width:100%;min-width:610px;max-width:1100px}
+.atlas-svg{display:block;width:100%;height:auto;border-radius:6px}
+.atlas-detail{display:flex;gap:20px;justify-content:space-between;align-items:center;border-top:1px solid #46543e;padding:14px 22px}
+.atlas-detail strong{font-family:Cinzel,serif;color:#ead5a5}
+.atlas-detail p{font-size:12px;color:#c1cbb8;margin:6px 0}
+.atlas-tag{font-size:11px;color:#a8c7a4}
+.atlas-legend{font-size:11px;color:#9aad97}
+.atlas-footer{padding:0 22px 15px;display:flex;justify-content:flex-end}.atlas-footer .primary{width:auto;margin:0}
+@media(max-width:700px){.atlas-detail{display:block}.atlas-legend{margin-top:10px}.atlas-header h2{font-size:18px}}
