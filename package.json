@@ -1,0 +1,23 @@
+{
+  "name": "realmforge",
+  "private": true,
+  "version": "0.1.0",
+  "description": "RPG multiplayer web com mapas 2D e mundos persistentes",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run build -w @realmforge/contracts && concurrently -n API,WEB \"npm run dev -w @realmforge/api\" \"npm run dev -w @realmforge/web\"",
+    "build": "npm run build -w @realmforge/contracts && npm run build -w @realmforge/api && npm run build -w @realmforge/web",
+    "test": "npm run build -w @realmforge/contracts && npm run build -w @realmforge/api && npm run test -w @realmforge/api",
+    "typecheck": "npm run build -w @realmforge/contracts && npm run build -w @realmforge/api && npm run typecheck -w @realmforge/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "typescript": "^5.9.3"
+  }
+}
