@@ -53,6 +53,18 @@ docs/
 
 *Chronica* era o nome provisório usado nos documentos antes de o projeto ser chamado RealmForge.
 
+
+## Mapas e percursos — primeira expansão
+
+- [Atlas geral da jornada (SVG)](assets/maps/route-atlas.svg) — rota esquemática com 30 marcos.
+- [Prévias originais dos 14 mapas](assets/maps/previews/) — top-down 36 × 24 tiles, por bioma.
+- [Guia dos mapas e percursos](docs/mapas-e-percursos.md) — lista de cenas, modelo de transição, persistência e limitações.
+- [Dados canônicos do protótipo](packages/contracts/src/world-atlas.ts) — cenas, biomas, paradas e conexões.
+
+No navegador, clique em **Abrir atlas da jornada** para consultar os locais. Para mudar de cena, caminhe até o extremo oeste/leste da trilha e escolha o destino vizinho na coluna lateral, ou clique no portal dourado. O Mestre (demo) pode alternar entre cenas sem caminhar até a borda.
+
+As prévias SVG são **esquemáticas, não arte final**. As posições no atlas não seguem escala geográfica real.
+
 ## Segurança e licenciamento
 
 **Não publique esta versão como servidor aberto.** O papel de Mestre é escolhido pelo visitante, não há autenticação, controle de acesso nem proteção contra abuso. O modo de demonstração é destinado exclusivamente ao desenvolvimento local.
