@@ -20,6 +20,14 @@ npm run dev
 
 Acesse http://localhost:5173 em dois navegadores/abas. Entre com nomes diferentes e controle personagens por clique ou WASD/setas após focar a área do mapa. Em uma aba, selecione **Mestre (demo)** para experimentar o editor de terrenos. Clique na porta dourada para abrir ou fechar. O mundo deve persistir mesmo após reiniciar a API, desde que o volume PostgreSQL seja mantido.
 
+## Mapas e viagens
+
+A versão atual inclui 14 cenas conectadas e um atlas interativo de 30 marcos. Você inicia em Hobbiton. Use **Abrir atlas da jornada** para consultar o roteiro e navegue entre mapas adjacentes pela coluna lateral ou pelas portas de viagem douradas.
+
+A viagem de jogadores requer alcançar a região oeste (x ≤ 3) ou leste (x ≥ largura − 4) da cena; o Mestre pode atravessar sem essa restrição no modo de demonstração. A localização do personagem e as alterações de terreno por cena são salvas no PostgreSQL.
+
+Prévia dos mapas em `assets/maps/previews/`. Atlas em `assets/maps/route-atlas.svg`.
+
 ## Ferramentas
 
 - Mover: deslocamento de uma casa ortogonal de cada vez.
