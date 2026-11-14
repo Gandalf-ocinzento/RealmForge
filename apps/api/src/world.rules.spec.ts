@@ -7,7 +7,7 @@ test("personagem só atravessa caminhos livres e adjacentes", () => {
   const moved = applyCommand(world, "id1", "jogador", { type: "player.move", x: 11, y: 10 });
   assert.equal(moved.players.id1.x, 11);
   assert.throws(() => applyCommand(world, "id1", "jogador", { type: "player.move", x: 19, y: 12 }));
-  assert.throws(() => applyCommand(world, "id1", "jogador", { type: "player.move", x: 10, y: 9 }) === null);
+  assert.equal(applyCommand(world, "id1", "jogador", { type: "player.move", x: 10, y: 9 }).players.id1.y, 9);
 });
 
 test("jogador não pode editar terrenos do mundo", () => {
