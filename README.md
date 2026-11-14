@@ -1,31 +1,60 @@
 # RealmForge
 
-**RealmForge** é um projeto de RPG de mesa online no navegador, com mundo persistente, mapas 2D vistos de cima, editor visual para o Mestre, multiplayer em tempo real e NPCs assistidos por IA.
+**RealmForge** é uma plataforma de RPG de mesa multiplayer para navegador, com mapas 2D, editor visual, mundo persistente e ferramentas para o Mestre.
 
-## Visão do projeto
+> **Status:** protótipo experimental local em implementação. Há código para uma primeira vila jogável; ainda não foi executado um build completo neste ambiente. O tema de *A Sociedade do Anel* permanece como referência de pesquisa, sem recursos protegidos incorporados ao protótipo.
 
-- **Jogabilidade:** campanhas multiplayer com ferramentas do Mestre, interações e consequências persistentes.
-- **Cenário de referência:** uma campanha inspirada na jornada de *A Sociedade do Anel*, cobrindo Condado, Bri, Valfenda, Moria, Lothlórien e Anduin.
-- **Arquitetura proposta:** React, TypeScript, PixiJS, NestJS, Socket.IO, PostgreSQL, Redis, armazenamento S3/MinIO e workers opcionais de IA.
-- **Primeira entrega:** uma cena top-down jogável no navegador, com dois jogadores sincronizados, um objeto interativo e estado salvo no servidor.
+## Tecnologias
 
-## Documentação
+- **TypeScript:** React + PixiJS para o cliente; NestJS + Socket.IO no servidor; contratos compartilhados.
+- **PostgreSQL:** fonte de verdade do estado persistente.
+- **Python:** planejado para agentes de IA em fase posterior.
 
-1. [Especificação técnica v1.0](docs/chronica-especificacao-tecnica-v1.md) — arquitetura, funcionalidades, banco de dados, APIs, segurança, organização do monorepositório e roadmap.
-2. [Dossiê cartográfico: A Sociedade do Anel](docs/chronica-sociedade-do-anel-roteiro-cartografico.md) — fontes, roteiro, regiões, mapas, missões e prioridades da campanha.
+Consulte a [decisão tecnológica](docs/decisao-tecnologica.md) para a comparação com Go, Rust, C# e Godot.
 
-> **Nota de nomenclatura:** *Chronica* foi o nome provisório usado na fase de planejamento. O nome do repositório e do projeto passa a ser **RealmForge**. Os documentos originais foram preservados para manter o histórico do planejamento.
+## Executar localmente
 
-> **Direitos autorais:** referências à Terra-média, seus personagens, locais, mapas e histórias são material de estudo de uma potencial adaptação. A publicação ou distribuição de conteúdo baseado nessas obras depende de análise e, quando necessário, licença dos titulares dos direitos. Não reutilizar mapas ou ilustrações protegidos sem autorização.
+Requisitos: Node.js 22+, npm 10+, Docker e Docker Compose.
 
-## Estado atual
+```bash
+git clone https://github.com/Gandalf-ocinzento/RealmForge.git
+cd RealmForge
+cp .env.example .env
+npm install
+docker compose up -d
+npm run dev
+```
 
-**Planejamento/documentação.** Ainda não há aplicação implementada ou build jogável. O próximo marco é validar o motor de mapas, a sincronização multiplayer e a persistência numa única cena.
+Abra **http://localhost:5173** em dois navegadores/abas e entre com nomes diferentes.
 
-## Primeiro marco de engenharia
+O primeiro protótipo implementa um mapa original 2D com movimento de personagens, comunicação em tempo real, chat, zoom, pintura de terrenos pelo Mestre (modo de demonstração), porta interativa e salvamento de estado no PostgreSQL.
 
-1. Inicializar o monorepositório com `apps/web`, `apps/api` e `packages/contracts`.
-2. Exibir o mapa inicial no PixiJS, com pan/zoom e colisões.
-3. Sincronizar dois navegadores pelo Socket.IO.
-4. Salvar o estado de uma interação com porta/baú no PostgreSQL.
-5. Permitir ao Mestre editar e publicar camadas e objetos.
+Confira o [guia de execução e limitações](docs/executar-mvp.md).
+
+## Estrutura
+
+```text
+apps/
+  web/               React + PixiJS
+  api/               NestJS + Socket.IO + PostgreSQL
+packages/
+  contracts/         Tipos e mensagens compartilhadas
+docs/
+  decisao-tecnologica.md
+  executar-mvp.md
+  chronica-especificacao-tecnica-v1.md
+  chronica-sociedade-do-anel-roteiro-cartografico.md
+```
+
+## Documentação original
+
+- [Especificação técnica](docs/chronica-especificacao-tecnica-v1.md) — arquitetura e roadmap.
+- [Pesquisa cartográfica de A Sociedade do Anel](docs/chronica-sociedade-do-anel-roteiro-cartografico.md) — roteiro, geografia e mapas planejados.
+
+*Chronica* era o nome provisório usado nos documentos antes de o projeto ser chamado RealmForge.
+
+## Segurança e licenciamento
+
+**Não publique esta versão como servidor aberto.** O papel de Mestre é escolhido pelo visitante, não há autenticação, controle de acesso nem proteção contra abuso. O modo de demonstração é destinado exclusivamente ao desenvolvimento local.
+
+A Terra-média e os elementos de *O Senhor dos Anéis* são obras protegidas. A publicação de uma adaptação ou uso de mapas/personagens licenciados exige análise dos direitos aplicáveis e das autorizações necessárias.
